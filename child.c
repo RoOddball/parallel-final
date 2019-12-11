@@ -1,0 +1,246 @@
+#include "header.h"
+
+void* child(void* rank){
+
+    printf("\nhere i go");
+    int localM = m*m/threadCount;
+    long myRank = (long) rank;
+    int i,k,l,mm;
+    int firstElement = myRank*localM;
+    int lastElement =(myRank+1)*localM;
+    int neverInfected,survivors,incubated,infected,dead,removed;
+    int myRow = (i-i%m)/m;
+    int myCol = i%m;
+
+    neverInfected = 0;
+    survivors = 0;
+    incubated = 0;
+    infected = 0;
+    dead = 0;
+    removed = 0;
+    mm=m*m;
+
+    printf("\n\n\n\n i am thread %ld my m is %d, start %ld finish %ld",myRank,localM,localM*myRank,(myRank+1)*localM);
+
+    printf("\n\n my row %d my column %d ",myRow,myCol);
+
+    while(inputTurn>0){
+
+        printf("\n\n\n\n i am thread %ld my m is %d, start %ld finish %ld \n i'm in",myRank,localM,localM*myRank,(myRank+1)*localM);
+
+
+        for(i=firstElement;i<lastElement;i++){
+
+            printf("\n%d",subjectsArray[i]);
+
+            int upperRow = (myRow+m-1)%m;
+            int lowerRow = (myRow+1)%m;
+            int leftCol = (m+myCol-1)%m;
+            int rightCol = (myCol+1)%m;
+            int neighborsInd[8];
+            int futureStateIndex = i+mm;
+
+            neighborsInd[0] = myRow*m+leftCol;
+            neighborsInd[1] = upperRow*m+leftCol;
+            neighborsInd[2] = upperRow*m+myCol;
+            neighborsInd[3] = upperRow*m+rightCol;
+            neighborsInd[4] = myRow*m+rightCol;
+            neighborsInd[5] = lowerRow*m+rightCol;
+            neighborsInd[6] = lowerRow*m+myCol;
+            neighborsInd[7] = lowerRow*m+leftCol;
+
+                printf("\n\n subject %d: %d neighbors:\n",i,subjectsArray[i]);
+
+                //process neighbors loop begin
+
+                for(k=0;k<8;k++){
+
+
+                    int indexNeighbor = neighborsInd[k]+mm;
+                    int neighbor = subjectsArray[indexNeighbor];
+
+                    printf(" %d ",indexNeighbor);
+
+                    // infect neighbors begin
+
+                    if(neighbor<IMMUNE_TH && neighbor>0 && neighbor<INCUBATED_TH){
+
+	                    float resistance;
+
+	                    if(neighbor%100>15 && neighbor%INCUBATED_TH<50)
+
+	                        resistance = 67;
+	                    else{
+
+	                        resistance = 49;
+	                    }
+	                    if(getRandomNumberFromRange(0.0,resistance)<=1){
+
+	                        neighbor = neighbor+COUNTER_TO_STATE;
+	                    }
+	                }
+
+                    int element = subjectsArray[i];
+
+	                if(element>0 && element<IMMUNE_TH && element>=INCUBATED_TH){
+
+	                    if(quarantine==0){
+
+	                        printf("--processed neighbor%d:->%d %d",indexNeighbor-mm,indexNeighbor,subjectsArray[indexNeighbor]);
+	                        subjectsArray[indexNeighbor] = neighbor;
+	                        printf(" to %d \n", subjectsArray[indexNeighbor]);
+
+	                    }else if(quarantine>0 && (int)subjectsArray[indexNeighbor]<QUARANTINE_TH) {
+
+	                        printf("--processed neighbor%d: %d",indexNeighbor-mm,subjectsArray[indexNeighbor]);
+	                        subjectsArray[indexNeighbor] = neighbor;
+	                        printf(" to %d \n", subjectsArray[indexNeighbor]);
+	                    }
+	                }
+
+                    //infect neighbors end
+
+                }
+
+                //process neighbors loop end
+
+
+
+                //process sick begin
+
+
+                int subject = subjectsArray[i];
+                int futureSubject = subjectsArray[futureStateIndex];
+
+                printf("\n\n subject %d-->%d was: %d",i,futureStateIndex,subjectsArray[futureStateIndex]);
+
+                if(subject<IMMUNE_TH && subject>=INCUBATED_TH)
+                    if(futureSubject>=DECEASED_TH){
+
+	                    printf("\n this subject is down");
+
+	                    if(traditions>0){
+
+	                        if(futureSubject<REMOVED_TH){
+
+	                            printf("\n traditions %d",traditions);
+	                            futureSubject = subject+COUNTER_TO_STATE;
+	                        }else{
+
+	                            futureSubject = 0;
+	                        }
+                        }else{
+
+	                            futureSubject = 0;
+	                    }
+                    }else{
+
+	                    int stateEvolution = 1;
+
+	                    if(futureSubject<INFECTED_TH){
+
+                            futureSubject=futureSubject+100;
+	                        stateEvolution--;
+	                    }else{
+
+	                        if(getRandomNumberFromRange(0.0,10.0)<=9.0 && stateEvolution>0){
+
+	                            stateEvolution--;
+	                            printf("\n -- subject vizibly infected");
+	                            futureSubject = futureSubject + COUNTER_TO_STATE;
+	                        }else{
+
+	                            futureSubject=futureSubject+IMMUNE_TH;
+	                            printf("\n !!subject outlasts desease");
+	                        }
+                       }
+
+                    }
+                    //process sick end
+
+                //update begin
+
+                subjectsArray[futureStateIndex] = futureSubject;
+                printf(" -- is: %d \n",subjectsArray[futureStateIndex]);
+
+                printf("\n updating subject %d from: %d",j+i*m, subjectsArray[i]);
+                subjectsArray[i]=subjectsArray[futureStateIndex];
+                printf(", to: %d",subjectsArray[i]);
+
+                //update end
+
+                printf("\n\n\nday: %d",turn);
+
+
+            }// big 4
+
+            //sum up begin
+
+            for(i=0;i<m;i++)
+                for(j=0;j<m;j++){
+
+                    int sumsubject= subjectsArray[i];
+
+                    if(sumsubject<INCUBATED_TH && sumsubject>0){
+
+                        neverInfected++;
+                    }
+
+                    if(sumsubject>=IMMUNE_TH){
+
+                        survivors++;
+                    }
+
+                    if(sumsubject>=INCUBATED_TH && sumsubject<INFECTED_TH){
+
+                        incubated++;
+                    }
+
+                    if(sumsubject>=INFECTED_TH && sumsubject<DECEASED_TH){
+
+                        infected++;
+                    }
+
+                    if(sumsubject>=DECEASED_TH && sumsubject<IMMUNE_TH){
+
+	                    dead++;
+                    }
+
+                    if(sumsubject==0){
+
+	                    removed++;
+                    }
+                }
+
+                printf(" \n\n never infected: %d \n survivors: %d \n incubated: %d \n infected: %d \n dead: %d \n removed: %d \n\n\n",neverInfected,survivors,incubated,infected,dead,removed );
+                //sum up end
+
+
+
+            sem_wait(&count_sem);
+            if(counter == threadCount-1){
+                counter = 0;
+                turn++;
+                inputTurn--;
+                sem_post(&count_sem);
+                for(i=0;i<threadCount;i++)
+                    sem_post(&barrier_sem);
+            }else{
+                counter++;
+                sem_post(&count_sem);
+                sem_wait(&barrier_sem);
+            }
+
+    }//while
+
+    pthread_mutex_lock(&myLock1);
+    threadHome++;
+    pthread_mutex_unlock(&myLock1);
+
+    while(threadHome<threadCount);
+
+
+    printf("\ni %ld exited count is %d, threashold is %d",myRank,counter,barrierTH);
+    //pthread_mutex_unlock(&myLock3);
+    return NULL;
+}

@@ -1,0 +1,14 @@
+2.12: 2.7.o 2.7mean.o 2.7stdev.o myheader.h
+     gcc 2.7.o 2.7mean.o 2.7stdev.o -o 2.7
+
+2.7.o: 2.7.c
+	gcc -c 2.7.c
+
+2.7mean.o: 2.7mean.c myheader.h
+	gcc -c 2.7mean.c
+
+2.7stdev.o: 2.7stdev.c myheader.h
+	gcc -c 2.7stdev.c
+
+clean:
+	rm -f *.o 2.12
