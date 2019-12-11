@@ -1,4 +1,3 @@
-
 #include "header.h"
 
 int main(){
@@ -86,6 +85,8 @@ int main(){
     sem_destroy(&count_sem);
     sem_destroy(&barrier_sem);
     pthread_mutex_destroy(&myLock1);
+    //pthread_mutex_destroy(&myLock2);
+    //pthread_mutex_destroy(&myLock3);
 
     free(subjectsArray);
 
