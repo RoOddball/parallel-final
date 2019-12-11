@@ -9,4 +9,3 @@ float getRandomNumberFromRange(float x, float y){
 
   return result;
 }
-

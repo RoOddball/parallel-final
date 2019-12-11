@@ -83,10 +83,10 @@ void* child(void* rank){
 
 	                    if(neighbor%100>15 && neighbor%INCUBATED_TH<50)
 
-	                        resistance = 67;
+	                        resistance = 65;
 	                    else{
 
-	                        resistance = 49;
+	                        resistance = 45;
 	                    }
 	                    if(getRandomNumberFromRange(0.0,resistance)<=1){
 

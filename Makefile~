@@ -1,14 +1,11 @@
-2.12: 2.7.o 2.7mean.o 2.7stdev.o myheader.h
-     gcc 2.7.o 2.7mean.o 2.7stdev.o -o 2.7
+ebola: main.o child.o random.o header.h
+	gcc main.o child.o random.o -o ebola
 
-2.7.o: 2.7.c
-	gcc -c 2.7.c
+main.o: main.c header.h
+	gcc -c main.c
 
-2.7mean.o: 2.7mean.c myheader.h
-	gcc -c 2.7mean.c
+child.o: child.c header.h
+	gcc -c child.c
 
-2.7stdev.o: 2.7stdev.c myheader.h
-	gcc -c 2.7stdev.c
-
-clean:
-	rm -f *.o 2.12
+random.o: random.o header.h
+	gcc -c random.c

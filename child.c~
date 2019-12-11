@@ -104,7 +104,7 @@ void* child(void* rank){
 	                        subjectsArray[indexNeighbor] = neighbor;
 	                        printf(" to %d \n", subjectsArray[indexNeighbor]);
 
-	                    }else if(quarantine>0 && (int)subjectsArray[indexNeighbor]<QUARANTINE_TH) {
+	                    }else if(quarantine>0 && element<QUARANTINE_TH) {
 
 	                        printf("--processed neighbor%d: %d",indexNeighbor-mm,subjectsArray[indexNeighbor]);
 	                        subjectsArray[indexNeighbor] = neighbor;
@@ -225,8 +225,6 @@ void* child(void* rank){
 	                    removed++;
                     }
                 }
-                for(i=0;i<mm;i++)
-                    printf("\n subject %d %d",i,subjectsArray[i]);
 
                 printf(" \n\n never infected: %d \n survivors: %d \n incubated: %d \n infected: %d \n dead: %d \n removed: %d \n\n\n",neverInfected,survivors,incubated,infected,dead,removed );
                 //sum up end
